@@ -2,6 +2,7 @@ import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
   try {
+    // Create products table
     await sql`CREATE TABLE IF NOT EXISTS products (
       id SERIAL PRIMARY KEY,
       name TEXT UNIQUE NOT NULL,
@@ -12,40 +13,50 @@ export default async function handler(req, res) {
       createdAt TIMESTAMPTZ DEFAULT NOW()
     );`;
 
+    // Create inventory table
     await sql`CREATE TABLE IF NOT EXISTS inventory (
       id SERIAL PRIMARY KEY,
-      productId INT UNIQUE NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-      quantityOnHand INT NOT NULL DEFAULT 0
+      productId INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      quantityOnHand INT DEFAULT 0,
+      createdAt TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(productId)
+    );`;
+
+    // Create sales table
+    await sql`CREATE TABLE IF NOT EXISTS sales (
+      id SERIAL PRIMARY KEY,
+      customerName TEXT NOT NULL,
+      productId INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      amountPaid NUMERIC(12,2) NOT NULL,
+      purchaseDate DATE NOT NULL,
+      deliveryStage TEXT NOT NULL DEFAULT 'awaiting_pickup',
+      createdAt TIMESTAMPTZ DEFAULT NOW()
     );`;
 
     if (req.method === 'GET') {
       const { rows } = await sql`
-        SELECT i.*, p.name
-        FROM inventory i
-        LEFT JOIN products p ON p.id = i.productId
-        ORDER BY p.name ASC;
+        SELECT s.*, p.name AS productName 
+        FROM sales s 
+        LEFT JOIN products p ON p.id = s.productId 
+        ORDER BY s.createdAt DESC;
       `;
       return res.status(200).json(rows);
     }
 
-    if (req.method === 'PUT') {
-      const { productId, quantityOnHand } = req.body || {};
-      if (productId === undefined || quantityOnHand === undefined) {
-        return res.status(400).json({ error: 'Missing fields: productId and quantityOnHand' });
+    if (req.method === 'POST') {
+      const { customerName, productId, amountPaid, purchaseDate, deliveryStage } = req.body || {};
+      
+      if (!customerName || !productId || amountPaid === undefined || !purchaseDate) {
+        return res.status(400).json({ error: 'Missing required sale fields' });
       }
 
       const result = await sql`
-        UPDATE inventory
-        SET quantityOnHand = ${Number(quantityOnHand)}
-        WHERE productId = ${Number(productId)}
+        INSERT INTO sales (customerName, productId, amountPaid, purchaseDate, deliveryStage)
+        VALUES (${customerName}, ${Number(productId)}, ${Number(amountPaid)}, ${purchaseDate}, ${deliveryStage || 'awaiting_pickup'})
         RETURNING *;
       `;
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Inventory record not found' });
-      }
-
-      return res.status(200).json(result.rows[0]);
+      
+      return res.status(201).json(result.rows[0]);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
