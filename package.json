@@ -1,27 +1,16 @@
 {
   "name": "emd-secretary-desk",
   "version": "1.0.0",
-  "description": "EMD Secretary Desk - Inventory and Sales Management System",
   "private": true,
-  "type": "module",
-  "homepage": "https://owurakwabenah-droid.github.io/EMD-Kuamsi",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint src --ext .js,.jsx"
+    "dev": "vercel dev",
+    "build": "echo \"Nothing to build for static frontend + Vercel API\"",
+    "start": "vercel dev"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@vercel/postgres": "^0.8.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.10",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.35.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "vercel": "^34.2.2"
   }
 }
