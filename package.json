@@ -1,8 +1,10 @@
 {
   "name": "emd-secretary-desk",
   "version": "1.0.0",
-  "description": "EMD Secretary Desk - Inventory & Sales Management System",
+  "description": "EMD Secretary Desk - Inventory and Sales Management System",
+  "private": true,
   "type": "module",
+  "homepage": "https://owurakwabenah-droid.github.io/EMD-Kuamsi",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -14,10 +16,10 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.8",
-    "eslint": "^8.54.0",
-    "eslint-plugin-react": "^7.33.2"
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.10",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.35.0"
   },
   "engines": {
     "node": ">=18.0.0"
